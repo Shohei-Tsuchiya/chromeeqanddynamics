@@ -2,6 +2,8 @@
 
 Chrome 拡張機能。Web ページ上の `<audio>` / `<video>` に **4バンド・パラメトリック EQ**、**コンプレッサー**、**リミッター** を Web Audio API でリアルタイム適用します。
 
+**リポジトリ:** https://github.com/Shohei-Tsuchiya/chromeeqanddynamics
+
 ## 機能
 
 - **4-Band Parametric EQ** — 各バンドの周波数・Q・ゲインを独立調整。EQ カーブをポップアップ上で可視化
