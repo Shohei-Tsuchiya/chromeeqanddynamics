@@ -75,6 +75,7 @@ If audio is silent after installing, refresh the page once.
 | **ショップアイコン**（Store icon） | `store-assets/screenshots/store-icon-128x128.png` | **128×128** |
 | **スクリーンショット** | `store-assets/screenshots/screenshot-1280x800.png` | **1280×800** |
 | **小プロモタイル**（Small promo tile・必須） | `store-assets/screenshots/promo-small-440x280.png` | **440×280** |
+| **マーキープロモタイル**（Marquee・任意） | `store-assets/screenshots/promo-marquee-1400x560.png` または `.jpg` | **1400×560**（24bit PNG / JPEG） |
 
 > **注意:** `screenshot-1280x800.png` は **スクリーンショット欄** 用です。**ショップアイコン欄には使えません**（128×128 が必要）。
 
