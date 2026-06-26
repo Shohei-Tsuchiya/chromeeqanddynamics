@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AuraAudio Screenshot</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 1280px;
+      height: 800px;
+      background: radial-gradient(circle at 20% 20%, #1e293b 0%, #0b0f19 55%, #020617 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, sans-serif;
+    }
+    .wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+    .title {
+      color: #e2e8f0;
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .subtitle {
+      color: #94a3b8;
+      font-size: 16px;
+      margin-top: -12px;
+    }
+    iframe {
+      width: 440px;
+      height: 600px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+      background: #0b0f19;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">AuraAudio EQ &amp; Dynamics</div>
+    <div class="subtitle">4-Band EQ · Compressor · Limiter for Web Audio</div>
+    <iframe src="preview.html" title="AuraAudio popup"></iframe>
+  </div>
+</body>
+</html>

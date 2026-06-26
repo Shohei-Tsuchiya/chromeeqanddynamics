@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>AuraAudio Store Preview</title>
+  <link rel="stylesheet" href="../popup.css">
+  <style>
+    html, body {
+      width: 440px;
+      height: 600px;
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="logo-area">
+        <span class="logo-dot"></span>
+        <h1>AuraAudio</h1>
+      </div>
+      <div class="master-control">
+        <span class="master-label" id="master-status-text">ENABLED</span>
+        <label class="switch">
+          <input type="checkbox" id="master-toggle" checked>
+          <span class="slider-round"></span>
+        </label>
+      </div>
+    </header>
+
+    <section class="effect-card presets-top" id="presets-card">
+      <div class="card-header">
+        <div class="card-title">
+          <span class="status-indicator" style="background: #6366f1;"></span>
+          <h2>プリセット管理</h2>
+        </div>
+      </div>
+      <div class="preset-card-body">
+        <div class="control-group">
+          <div class="control-label">
+            <span>スロット選択</span>
+            <span class="value-display" id="preset-slot-display">Slot 1</span>
+          </div>
+          <select id="preset-slot-select" class="preset-slot-select">
+            <option value="1">Slot 1</option>
+            <option value="2">Slot 2</option>
+            <option value="3">Slot 3</option>
+          </select>
+        </div>
+        <div class="preset-actions">
+          <button class="action-btn" id="preset-save-btn">現在の設定を保存</button>
+          <button class="action-btn" id="preset-load-btn">選択スロットを読み込む</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="visualizer-section">
+      <div class="canvas-container">
+        <canvas id="eq-curve-canvas" width="410" height="120"></canvas>
+        <div class="freq-labels">
+          <span>20Hz</span>
+          <span>100Hz</span>
+          <span>1kHz</span>
+          <span>10kHz</span>
+          <span>20kHz</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="settings-content">
+      <section class="effect-card" id="eq-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="status-indicator" id="eq-indicator"></span>
+            <h2>イコライザー (EQ)</h2>
+          </div>
+          <div class="header-actions">
+            <button class="action-btn" id="eq-reset-btn">DEF</button>
+            <button class="bypass-btn active" id="eq-bypass-btn">ACTIVE</button>
+          </div>
+        </div>
+        <div class="eq-controls-container">
+          <div class="band-tabs">
+            <button class="band-tab-btn active" data-band="1" style="--band-color: #00f0ff;">
+              <span class="band-dot"></span>L (100Hz)
+            </button>
+            <button class="band-tab-btn" data-band="2" style="--band-color: #10b981;">
+              <span class="band-dot"></span>LM (400Hz)
+            </button>
+            <button class="band-tab-btn" data-band="3" style="--band-color: #f59e0b;">
+              <span class="band-dot"></span>HM (2kHz)
+            </button>
+            <button class="band-tab-btn" data-band="4" style="--band-color: #f43f5e;">
+              <span class="band-dot"></span>H (8kHz)
+            </button>
+          </div>
+          <div class="band-sliders-panel">
+            <div class="control-group">
+              <div class="control-label">
+                <span>周波数 (Frequency)</span>
+                <span class="value-display" id="eq-freq-val">100 Hz</span>
+              </div>
+              <input type="range" id="eq-freq-slider" min="0" max="1000" step="1" value="100">
+            </div>
+            <div class="control-group">
+              <div class="control-label">
+                <span>Q値 (Bandwidth)</span>
+                <span class="value-display" id="eq-q-val">1.0</span>
+              </div>
+              <input type="range" id="eq-q-slider" min="0.1" max="10" step="0.1" value="1.0">
+            </div>
+            <div class="control-group">
+              <div class="control-label">
+                <span>ゲイン (Gain)</span>
+                <span class="value-display" id="eq-gain-val">+4.5 dB</span>
+              </div>
+              <input type="range" id="eq-gain-slider" min="-15" max="15" step="0.5" value="4.5">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="effect-card" id="comp-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="status-indicator" id="comp-indicator"></span>
+            <h2>コンプレッサー</h2>
+          </div>
+          <div class="header-actions">
+            <button class="action-btn" id="comp-reset-btn">DEF</button>
+            <button class="bypass-btn active" id="comp-bypass-btn">ACTIVE</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="control-row-grid">
+            <div class="control-group">
+              <div class="control-label">
+                <span>入力ゲイン (Input Gain)</span>
+                <span class="value-display" id="comp-input-gain-val">0.0 dB</span>
+              </div>
+              <input type="range" id="comp-input-gain" min="-12" max="24" step="0.5" value="0.0">
+            </div>
+            <div class="control-group">
+              <div class="control-label">
+                <span>スレッショルド (Threshold)</span>
+                <span class="value-display" id="comp-threshold-val">-24 dB</span>
+              </div>
+              <input type="range" id="comp-threshold" min="-60" max="0" step="1" value="-24">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="effect-card" id="limiter-card">
+        <div class="card-header">
+          <div class="card-title">
+            <span class="status-indicator" id="limiter-indicator"></span>
+            <h2>リミッター</h2>
+          </div>
+          <div class="header-actions">
+            <button class="action-btn" id="limiter-reset-btn">DEF</button>
+            <button class="bypass-btn active" id="limiter-bypass-btn">ACTIVE</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="control-row-grid">
+            <div class="control-group">
+              <div class="control-label">
+                <span>スレッショルド (Threshold)</span>
+                <span class="value-display" id="limiter-threshold-val">-1.0 dB</span>
+              </div>
+              <input type="range" id="limiter-threshold" min="-20" max="0" step="0.1" value="-1.0">
+            </div>
+            <div class="control-group">
+              <div class="control-label">
+                <span>出力ゲイン (Gain)</span>
+                <span class="value-display" id="limiter-output-gain-val">0.0 dB</span>
+              </div>
+              <input type="range" id="limiter-output-gain" min="-15" max="15" step="0.5" value="0.0">
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="footer">
+      <p>※音が出ない場合はページを更新してください。</p>
+    </footer>
+  </div>
+
+  <script src="../settings.js"></script>
+  <script>
+    window.chrome = {
+      storage: {
+        local: {
+          get(defaults, callback) {
+            const preview = {
+              ...defaults,
+              eqBand1Gain: 4.5,
+              eqBand3Gain: 2.0,
+              eqBand4Gain: -1.5
+            };
+            callback(preview);
+          },
+          set() {}
+        }
+      }
+    };
+  </script>
+  <script src="../popup.js"></script>
+</body>
+</html>
