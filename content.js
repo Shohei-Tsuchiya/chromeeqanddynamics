@@ -368,6 +368,20 @@
 
     if (isAudioRunning()) {
       connectMediaElement(el);
+      return;
+    }
+
+    if (!el.paused && el.readyState >= 2) {
+      onMediaPlayback(el);
+    }
+  }
+
+  function wakeUp() {
+    if (!shouldProcessAudio()) return;
+    startMonitoring();
+    if (isAudioRunning()) {
+      connectPendingMediaElements();
+      applySettings();
     }
   }
 
@@ -499,8 +513,11 @@
     if (message?.type === 'MASTER_DISABLED') {
       currentSettings.masterEnabled = false;
       releaseProcessing();
-    } else if (message?.type === 'REFRESH_SETTINGS') {
+    } else if (message?.type === 'REFRESH_SETTINGS' || message?.type === 'WAKE_UP') {
       bootstrap();
+      if (message?.type === 'WAKE_UP') {
+        wakeUp();
+      }
     }
   });
 

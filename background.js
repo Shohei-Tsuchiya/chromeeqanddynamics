@@ -3,7 +3,6 @@
 importScripts('settings.js');
 
 const SESSION_KEY = 'auraAudio_activeTabs';
-const CONTENT_FILES = ['settings.js', 'content.js'];
 
 function updateIcon(masterEnabled) {
   const iconPath = masterEnabled ? 'icon.png' : 'icon_disabled.png';
@@ -35,33 +34,9 @@ function isInjectableUrl(url) {
   return typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://'));
 }
 
-async function injectContentScripts(tabId) {
-  if (!tabId) return false;
-
-  const tab = await chrome.tabs.get(tabId).catch(() => null);
-  if (!tab || !isInjectableUrl(tab.url)) return false;
-
-  try {
-    await chrome.scripting.executeScript({
-      target: { tabId, allFrames: false },
-      files: CONTENT_FILES
-    });
-    return true;
-  } catch (err) {
-    console.warn('AuraAudio background: Injection failed', err);
-    return false;
-  }
-}
-
 async function activateTab(tabId) {
   if (!tabId) return;
-
   await markTabActive(tabId);
-
-  const items = await chrome.storage.local.get({ masterEnabled: DEFAULT_SETTINGS.masterEnabled });
-  if (items.masterEnabled === false) return;
-
-  await injectContentScripts(tabId);
 }
 
 async function notifyTabMasterDisabled(tabId) {
@@ -75,7 +50,7 @@ async function notifyTabMasterDisabled(tabId) {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message?.type === 'ACTIVATE_TAB') {
+  if (message?.type === 'MARK_TAB_ACTIVE' || message?.type === 'ACTIVATE_TAB') {
     activateTab(message.tabId || sender.tab?.id).then(() => sendResponse({ ok: true }));
     return true;
   }
@@ -94,18 +69,6 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
 chrome.tabs.onRemoved.addListener((tabId) => {
   unmarkTabActive(tabId);
-});
-
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
-  if (changeInfo.status !== 'complete') return;
-
-  const tabs = await getActiveTabs();
-  if (!tabs[String(tabId)]) return;
-
-  const items = await chrome.storage.local.get({ masterEnabled: DEFAULT_SETTINGS.masterEnabled });
-  if (items.masterEnabled === false) return;
-
-  await injectContentScripts(tabId);
 });
 
 chrome.runtime.onInstalled.addListener(() => {

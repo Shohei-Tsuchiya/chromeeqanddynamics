@@ -35,22 +35,36 @@ const offlineFilters = Array.from({ length: 4 }, () => {
 const magResponseScratch = Array.from({ length: 4 }, () => new Float32Array(numPoints));
 const phaseScratch = new Float32Array(numPoints);
 
-document.addEventListener('DOMContentLoaded', () => {
-  activateCurrentTab();
+document.addEventListener('DOMContentLoaded', async () => {
+  const items = await chrome.storage.local.get(DEFAULT_SETTINGS);
+  state = { ...DEFAULT_SETTINGS, ...items };
+  initUI();
+  drawEQCurve();
 
-  // Load settings from storage
-  chrome.storage.local.get(DEFAULT_SETTINGS, (items) => {
-    state = { ...DEFAULT_SETTINGS, ...items };
-    initUI();
-    drawEQCurve();
-  });
+  if (state.masterEnabled) {
+    await activateCurrentTab();
+  }
 });
+
+const CONTENT_FILES = ['settings.js', 'content.js'];
+
+function isInjectableUrl(url) {
+  return typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://'));
+}
 
 async function activateCurrentTab() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    if (!tab?.id) return;
-    await chrome.runtime.sendMessage({ type: 'ACTIVATE_TAB', tabId: tab.id });
+    if (!tab?.id || !isInjectableUrl(tab.url)) return;
+
+    await chrome.runtime.sendMessage({ type: 'MARK_TAB_ACTIVE', tabId: tab.id });
+
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id, allFrames: false },
+      files: CONTENT_FILES
+    });
+
+    await chrome.tabs.sendMessage(tab.id, { type: 'WAKE_UP' }).catch(() => {});
   } catch (err) {
     console.warn('AuraAudio popup: Failed to activate tab', err);
   }
