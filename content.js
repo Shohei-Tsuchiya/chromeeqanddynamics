@@ -173,7 +173,7 @@
     limiterOutput.connect(audioCtx.destination);
 
     settingsDirty = true;
-    applySettings();
+    applyEffectSettings();
   }
 
   function resumeAudioContext() {
@@ -224,21 +224,7 @@
     gestureListenersAttached = false;
   }
 
-  function disconnectAllMedia() {
-    hookedElements.forEach((source, el) => {
-      try {
-        source.disconnect();
-      } catch (e) {
-        console.warn('AuraAudio: Failed to disconnect source', e);
-      }
-      delete el.__auraAudioHooked;
-    });
-    hookedElements.clear();
-    pendingMediaElements.clear();
-  }
-
-  function releaseProcessing() {
-    disconnectAllMedia();
+  function stopMonitoring() {
     detachGestureListeners();
 
     if (scanTimer) {
@@ -250,6 +236,27 @@
       mutationObserver.disconnect();
       mutationObserver = null;
     }
+  }
+
+  function disconnectAllMedia() {
+    hookedElements.forEach((entry) => {
+      try {
+        entry.source.disconnect();
+      } catch (e) {
+        console.warn('AuraAudio: Failed to disconnect source', e);
+      }
+    });
+    hookedElements.forEach((_, el) => {
+      delete el.__auraAudioHooked;
+      delete el.__auraAudioPrepared;
+    });
+    hookedElements.clear();
+    pendingMediaElements.clear();
+  }
+
+  function releaseProcessingFully() {
+    disconnectAllMedia();
+    stopMonitoring();
 
     if (audioCtx && audioCtx.state !== 'closed') {
       audioCtx.close().catch(() => {});
@@ -260,12 +267,57 @@
     settingsDirty = true;
   }
 
-  function applySettings() {
-    if (!shouldProcessAudio()) {
-      releaseProcessing();
+  function enterMasterBypassMode() {
+    if (hookedElements.size === 0) {
+      releaseProcessingFully();
       return;
     }
 
+    initAudioGraph();
+    if (!audioCtx) return;
+
+    hookedElements.forEach((entry) => {
+      try {
+        entry.source.disconnect();
+        entry.source.connect(audioCtx.destination);
+        entry.directBypass = true;
+      } catch (e) {
+        console.warn('AuraAudio: Failed to enter bypass mode', e);
+      }
+    });
+
+    stopMonitoring();
+    resumeAudioContext().catch(() => {});
+  }
+
+  function enableMasterProcessing() {
+    if (!shouldProcessAudio()) return;
+
+    initAudioGraph();
+    if (!audioCtx) return;
+
+    const resume = audioCtx.state === 'suspended' ? resumeAudioContext() : Promise.resolve();
+
+    resume.then(() => {
+      hookedElements.forEach((entry) => {
+        try {
+          entry.source.disconnect();
+          entry.source.connect(mainInput);
+          entry.directBypass = false;
+        } catch (e) {
+          console.warn('AuraAudio: Failed to reconnect source', e);
+        }
+      });
+
+      applyEffectSettings();
+      connectPendingMediaElements();
+      startMonitoring();
+    }).catch(err => {
+      console.warn('AuraAudio: Failed to enable processing', err);
+    });
+  }
+
+  function applyEffectSettings() {
     if (!audioCtx) {
       settingsDirty = true;
       return;
@@ -318,14 +370,44 @@
     setAudioParam(limiterMakeupGain.gain, dbToGain(s.limiterOutputGain), tc);
   }
 
+  function applySettings() {
+    if (!shouldProcessAudio()) {
+      enterMasterBypassMode();
+      return;
+    }
+
+    if (!audioCtx) {
+      settingsDirty = true;
+      return;
+    }
+
+    applyEffectSettings();
+  }
+
   function connectMediaElement(el) {
-    if (!audioCtx || el.__auraAudioHooked || !shouldProcessAudio()) return;
+    if (!audioCtx || !shouldProcessAudio()) return;
+
+    const existing = hookedElements.get(el);
+    if (existing) {
+      try {
+        existing.source.disconnect();
+        existing.source.connect(mainInput);
+        existing.directBypass = false;
+        el.__auraAudioHooked = true;
+        pendingMediaElements.delete(el);
+      } catch (e) {
+        console.warn('AuraAudio: Failed to reconnect hooked element', e);
+      }
+      return;
+    }
+
+    if (el.__auraAudioHooked) return;
 
     try {
       const source = audioCtx.createMediaElementSource(el);
       source.connect(mainInput);
       el.__auraAudioHooked = true;
-      hookedElements.set(el, source);
+      hookedElements.set(el, { source, directBypass: false });
       pendingMediaElements.delete(el);
     } catch (e) {
       console.warn('AuraAudio: Could not hook element:', e);
@@ -479,11 +561,16 @@
     if (!changed) return;
 
     if (!shouldProcessAudio()) {
-      releaseProcessing();
+      enterMasterBypassMode();
       return;
     }
 
-    applySettings();
+    if (changes.masterEnabled && changes.masterEnabled.newValue === true) {
+      enableMasterProcessing();
+      return;
+    }
+
+    applyEffectSettings();
     if (!mutationObserver) {
       startMonitoring();
     }
@@ -494,9 +581,13 @@
       mergeSettingsFromStorage(items);
 
       if (shouldProcessAudio()) {
-        startMonitoring();
+        if (hookedElements.size > 0) {
+          enableMasterProcessing();
+        } else {
+          startMonitoring();
+        }
       } else {
-        releaseProcessing();
+        enterMasterBypassMode();
       }
     });
   }
@@ -512,7 +603,7 @@
   chrome.runtime.onMessage.addListener((message) => {
     if (message?.type === 'MASTER_DISABLED') {
       currentSettings.masterEnabled = false;
-      releaseProcessing();
+      enterMasterBypassMode();
     } else if (message?.type === 'REFRESH_SETTINGS' || message?.type === 'WAKE_UP') {
       bootstrap();
       if (message?.type === 'WAKE_UP') {
