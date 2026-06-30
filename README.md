@@ -28,17 +28,24 @@ Chrome 拡張機能。Web ページ上の `<audio>` / `<video>` に **4バンド
 
 ## 使い方
 
-1. 拡張機能アイコンをクリックしてポップアップを開く
+1. 音を処理したいページで **拡張機能アイコンをクリック**（ポップアップを開くとそのタブで処理が開始）
 2. EQ / Comp / Limiter を調整（各ブロックの **ACTIVE** で個別バイパス）
-3. マスタースイッチで全体 ON/OFF
-4. 音が出ない場合は **対象ページを再読み込み**（Web Audio のユーザー操作要件のため）
+3. マスタースイッチで全体 ON/OFF（**OFF 時は Web Audio を使わず、ページを更新すれば通常再生に戻ります**）
+4. 有効化後に音が出ない場合は **対象ページを再読み込み**
+
+## v1.0.1 の変更点
+
+- マスター OFF 時は `<video>` / `<audio>` をフックしない（YouTube の途切れ対策）
+- ポップアップを開いたタブのみ処理（`activeTab` + `scripting`）
+- `AudioContext` に `latencyHint: 'playback'` を指定
+- YouTube 向け DOM スキャンを軽量化
 
 ## プロジェクト構成
 
 ```
 manifest.json      MV3 マニフェスト
-background.js      ツールバーアイコン切替
-content.js         Web Audio グラフ（EQ / Comp / Limiter）
+background.js      タブ管理・スクリプト注入
+content.js         Web Audio グラフ（on-demand 注入）
 settings.js        デフォルト設定・ストレージキー
 popup.html/css/js  設定 UI
 icon*.png          拡張アイコン
@@ -57,14 +64,15 @@ node generate-icons.js
 powershell -ExecutionPolicy Bypass -File scripts\package-extension.ps1
 ```
 
-`dist/aura-audio-eq-dynamics-v1.0.zip` が生成されます。
+`dist/aura-audio-eq-dynamics-v1.0.1.zip` が生成されます。
 
 ## 権限について
 
 | 権限 | 理由 |
 |------|------|
 | `storage` | 設定とプリセットを端末内に保存 |
-| `<all_urls>` content script | ページ内メディアの音声を Web Audio で処理 |
+| `activeTab` | ユーザーがポップアップを開いたタブのみにアクセス |
+| `scripting` | 対象タブへ音声処理スクリプトを注入 |
 
 外部サーバーへの通信は行いません。詳細は [PRIVACY.md](PRIVACY.md) を参照してください。
 

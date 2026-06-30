@@ -23,8 +23,10 @@ This data never leaves your browser and is not sent to any server operated by th
 | Permission | Purpose |
 |------------|---------|
 | `storage` | Save and restore your effect settings and presets locally |
+| `activeTab` | Access only the tab where you open the extension popup |
+| `scripting` | Inject the audio processing script into the active tab on demand |
 
-Content scripts run on web pages solely to intercept and process `<audio>` / `<video>` playback through the Web Audio graph. No page content is read, logged, or transmitted.
+Content scripts run only after you open the popup on a tab. When master bypass is off, no media elements are hooked and no Web Audio graph is created.
 
 ## Third parties
 

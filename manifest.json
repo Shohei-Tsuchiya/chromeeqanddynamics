@@ -1,11 +1,13 @@
 {
   "manifest_version": 3,
   "name": "AuraAudio EQ & Dynamics",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "4-Band Parametric EQ, Compressor, and Limiter for Web Audio.",
   "homepage_url": "https://github.com/Shohei-Tsuchiya/chromeeqanddynamics",
   "permissions": [
-    "storage"
+    "storage",
+    "activeTab",
+    "scripting"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -24,16 +26,5 @@
   },
   "background": {
     "service_worker": "background.js"
-  },
-  "content_scripts": [
-    {
-      "matches": [
-        "http://*/*",
-        "https://*/*"
-      ],
-      "js": ["settings.js", "content.js"],
-      "run_at": "document_end",
-      "all_frames": true
-    }
-  ]
+  }
 }

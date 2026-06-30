@@ -36,6 +36,8 @@ const magResponseScratch = Array.from({ length: 4 }, () => new Float32Array(numP
 const phaseScratch = new Float32Array(numPoints);
 
 document.addEventListener('DOMContentLoaded', () => {
+  activateCurrentTab();
+
   // Load settings from storage
   chrome.storage.local.get(DEFAULT_SETTINGS, (items) => {
     state = { ...DEFAULT_SETTINGS, ...items };
@@ -43,6 +45,26 @@ document.addEventListener('DOMContentLoaded', () => {
     drawEQCurve();
   });
 });
+
+async function activateCurrentTab() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) return;
+    await chrome.runtime.sendMessage({ type: 'ACTIVATE_TAB', tabId: tab.id });
+  } catch (err) {
+    console.warn('AuraAudio popup: Failed to activate tab', err);
+  }
+}
+
+async function notifyCurrentTabMasterDisabled() {
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) return;
+    await chrome.runtime.sendMessage({ type: 'MASTER_DISABLED', tabId: tab.id });
+  } catch (err) {
+    console.warn('AuraAudio popup: Failed to notify tab', err);
+  }
+}
 
 function saveState() {
   chrome.storage.local.set(state);
@@ -67,10 +89,16 @@ function initUI() {
   masterToggle.checked = state.masterEnabled;
   updateMasterUI(state.masterEnabled);
   
-  masterToggle.addEventListener('change', (e) => {
+  masterToggle.addEventListener('change', async (e) => {
     state.masterEnabled = e.target.checked;
     updateMasterUI(state.masterEnabled);
     saveState();
+
+    if (state.masterEnabled) {
+      await activateCurrentTab();
+    } else {
+      await notifyCurrentTabMasterDisabled();
+    }
   });
 
   // ==========================================
