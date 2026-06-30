@@ -30,10 +30,6 @@ async function unmarkTabActive(tabId) {
   await chrome.storage.session.set({ [SESSION_KEY]: tabs });
 }
 
-function isInjectableUrl(url) {
-  return typeof url === 'string' && (url.startsWith('http://') || url.startsWith('https://'));
-}
-
 async function activateTab(tabId) {
   if (!tabId) return;
   await markTabActive(tabId);
