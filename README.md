@@ -2,6 +2,7 @@
 
 Chrome 拡張機能。Web ページ上の `<audio>` / `<video>` に **4バンド・パラメトリック EQ**、**コンプレッサー**、**リミッター** を Web Audio API でリアルタイム適用します。
 
+**Chrome Web Store:** https://chromewebstore.google.com/detail/auraaudio-eq-dynamics/bhndlolhfaliajeemcpdebgcbcbagcpi  
 **リポジトリ:** https://github.com/Shohei-Tsuchiya/chromeeqanddynamics
 
 ## 機能
@@ -11,6 +12,12 @@ Chrome 拡張機能。Web ページ上の `<audio>` / `<video>` に **4バンド
 - **Limiter** — Threshold / Output Gain
 - **プリセット** — 3 スロットに設定を保存・読み込み
 - **マスター ON/OFF** — ツールバーアイコンが状態に連動（有効: 青 / 無効: グレー）
+
+## インストール（Chrome Web Store）
+
+1. [AuraAudio EQ & Dynamics](https://chromewebstore.google.com/detail/auraaudio-eq-dynamics/bhndlolhfaliajeemcpdebgcbcbagcpi) を開く
+2. **Chrome に追加** をクリック
+3. 音が出ない場合は、対象ページを再読み込み
 
 ## インストール（開発者モード）
 
