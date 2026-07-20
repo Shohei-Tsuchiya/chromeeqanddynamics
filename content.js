@@ -18,6 +18,7 @@
   let gestureListenersAttached = false;
   const pendingMediaElements = new Set();
   const hookedElements = new Map();
+  const preparedElements = new WeakSet();
   let settingsDirty = true;
   let mutationObserver = null;
   let scanTimer = null;
@@ -238,6 +239,13 @@
     }
   }
 
+  function clearLegacyDomFlags() {
+    document.querySelectorAll('video, audio').forEach(el => {
+      delete el.__auraAudioHooked;
+      delete el.__auraAudioPrepared;
+    });
+  }
+
   function disconnectAllMedia() {
     hookedElements.forEach((entry) => {
       try {
@@ -245,10 +253,6 @@
       } catch (e) {
         console.warn('AuraAudio: Failed to disconnect source', e);
       }
-    });
-    hookedElements.forEach((_, el) => {
-      delete el.__auraAudioHooked;
-      delete el.__auraAudioPrepared;
     });
     hookedElements.clear();
     pendingMediaElements.clear();
@@ -293,6 +297,7 @@
   function enableMasterProcessing() {
     if (!shouldProcessAudio()) return;
 
+    clearLegacyDomFlags();
     initAudioGraph();
     if (!audioCtx) return;
 
@@ -393,7 +398,6 @@
         existing.source.disconnect();
         existing.source.connect(mainInput);
         existing.directBypass = false;
-        el.__auraAudioHooked = true;
         pendingMediaElements.delete(el);
       } catch (e) {
         console.warn('AuraAudio: Failed to reconnect hooked element', e);
@@ -401,16 +405,13 @@
       return;
     }
 
-    if (el.__auraAudioHooked) return;
-
     try {
       const source = audioCtx.createMediaElementSource(el);
       source.connect(mainInput);
-      el.__auraAudioHooked = true;
       hookedElements.set(el, { source, directBypass: false });
       pendingMediaElements.delete(el);
     } catch (e) {
-      console.warn('AuraAudio: Could not hook element:', e);
+      console.warn('AuraAudio: Could not hook element. Try refreshing the page:', e);
     }
   }
 
@@ -441,12 +442,14 @@
 
   function prepareMediaElement(el) {
     if (!shouldProcessAudio()) return;
-    if (el.__auraAudioHooked || el.__auraAudioPrepared) return;
+    if (hookedElements.has(el)) return;
 
-    el.__auraAudioPrepared = true;
+    if (!preparedElements.has(el)) {
+      preparedElements.add(el);
+      el.addEventListener('play', () => onMediaPlayback(el), { passive: true });
+    }
+
     pendingMediaElements.add(el);
-
-    el.addEventListener('play', () => onMediaPlayback(el), { passive: true });
 
     if (isAudioRunning()) {
       connectMediaElement(el);
@@ -460,7 +463,16 @@
 
   function wakeUp() {
     if (!shouldProcessAudio()) return;
+
+    clearLegacyDomFlags();
     startMonitoring();
+
+    findMediaElements().forEach(el => {
+      if (!hookedElements.has(el)) {
+        pendingMediaElements.add(el);
+      }
+    });
+
     if (isAudioRunning()) {
       connectPendingMediaElements();
       applySettings();
