@@ -10,6 +10,8 @@ const bandColors = ['#00f0ff', '#10b981', '#f59e0b', '#f43f5e'];
 
 const MIN_FREQ = 20;
 const MAX_FREQ = 20000;
+const EQ_GAIN_MIN = -24;
+const EQ_GAIN_MAX = 24;
 const LOG_FREQ_RATIO = Math.log(MAX_FREQ / MIN_FREQ);
 
 // Canvas Elements
@@ -297,7 +299,7 @@ function initUI() {
     
     // Boundary check
     newFreq = Math.max(MIN_FREQ, Math.min(MAX_FREQ, newFreq));
-    newGain = Math.max(-15, Math.min(15, newGain));
+    newGain = Math.max(EQ_GAIN_MIN, Math.min(EQ_GAIN_MAX, newGain));
     
     state[`eqBand${draggingBand}Freq`] = newFreq;
     state[`eqBand${draggingBand}Gain`] = newGain;
@@ -617,20 +619,16 @@ function xToFreq(x) {
   return MIN_FREQ * Math.pow(MAX_FREQ / MIN_FREQ, pct);
 }
 
-// Convert gain dB to Y coordinate (-15dB to +15dB range)
+// Convert gain dB to Y coordinate
 function gainToY(gainDb) {
-  const minDb = -15;
-  const maxDb = 15;
-  const pct = (gainDb - minDb) / (maxDb - minDb);
+  const pct = (gainDb - EQ_GAIN_MIN) / (EQ_GAIN_MAX - EQ_GAIN_MIN);
   return height * (1 - pct);
 }
 
 // Convert canvas Y to gain dB (inverse linear)
 function yToGain(y) {
-  const minDb = -15;
-  const maxDb = 15;
   const pct = 1 - Math.max(0, Math.min(1, y / height));
-  return minDb + pct * (maxDb - minDb);
+  return EQ_GAIN_MIN + pct * (EQ_GAIN_MAX - EQ_GAIN_MIN);
 }
 
 function drawEQCurve() {
