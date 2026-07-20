@@ -558,6 +558,7 @@
         currentSettings[key] = items[key];
       }
     });
+    migrateSettingsQ(currentSettings);
     settingsDirty = true;
   }
 
@@ -571,6 +572,8 @@
     });
 
     if (!changed) return;
+
+    migrateSettingsQ(currentSettings);
 
     if (!shouldProcessAudio()) {
       enterMasterBypassMode();

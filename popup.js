@@ -14,6 +14,29 @@ const EQ_GAIN_MIN = -24;
 const EQ_GAIN_MAX = 24;
 const LOG_FREQ_RATIO = Math.log(MAX_FREQ / MIN_FREQ);
 
+// Piecewise Q mapping: slider 0 → 0.1, 500 → 1.0, 1000 → 2.0
+function sliderToQ(sliderValue) {
+  const t = Math.max(0, Math.min(1, Number(sliderValue) / 1000));
+  let q;
+  if (t <= 0.5) {
+    q = EQ_Q_MIN + (t / 0.5) * (EQ_Q_CENTER - EQ_Q_MIN);
+  } else {
+    q = EQ_Q_CENTER + ((t - 0.5) / 0.5) * (EQ_Q_MAX - EQ_Q_CENTER);
+  }
+  return Math.round(q * 10) / 10;
+}
+
+function qToSlider(q) {
+  const clamped = Math.max(EQ_Q_MIN, Math.min(EQ_Q_MAX, Number(q)));
+  let t;
+  if (clamped <= EQ_Q_CENTER) {
+    t = 0.5 * ((clamped - EQ_Q_MIN) / (EQ_Q_CENTER - EQ_Q_MIN));
+  } else {
+    t = 0.5 + 0.5 * ((clamped - EQ_Q_CENTER) / (EQ_Q_MAX - EQ_Q_CENTER));
+  }
+  return Math.round(t * 1000);
+}
+
 // Canvas Elements
 const canvas = document.getElementById('eq-curve-canvas');
 const ctx = canvas.getContext('2d');
@@ -39,7 +62,8 @@ const phaseScratch = new Float32Array(numPoints);
 
 document.addEventListener('DOMContentLoaded', async () => {
   const items = await chrome.storage.local.get(DEFAULT_SETTINGS);
-  state = { ...DEFAULT_SETTINGS, ...items };
+  state = migrateSettingsQ({ ...DEFAULT_SETTINGS, ...items });
+  saveState();
   initUI();
   drawEQCurve();
 
@@ -237,7 +261,7 @@ function initUI() {
   });
   
   qSlider.addEventListener('input', (e) => {
-    const val = parseFloat(e.target.value);
+    const val = sliderToQ(e.target.value);
     state[`eqBand${activeBand}Q`] = val;
     document.getElementById('eq-q-val').innerText = val.toFixed(1);
     drawEQCurve();
@@ -424,6 +448,7 @@ function initUI() {
       if (items && items[PRESETS_KEY] && items[PRESETS_KEY][`slot${slotNum}`]) {
         const params = items[PRESETS_KEY][`slot${slotNum}`];
         Object.assign(state, DEFAULT_SETTINGS, params);
+        migrateSettingsQ(state);
         saveState();
         // Refresh UI without re-registering listeners
         syncUIFromState();
@@ -510,7 +535,7 @@ function loadActiveBandSliders() {
   // Convert actual frequency back to logarithmic slider value (0-1000)
   const pct = Math.log(freq / MIN_FREQ) / LOG_FREQ_RATIO;
   freqSlider.value = Math.round(pct * 1000);
-  qSlider.value = q;
+  qSlider.value = qToSlider(q);
   gainSlider.value = gain;
   
   document.getElementById('eq-freq-val').innerText = formatFreq(freq);
