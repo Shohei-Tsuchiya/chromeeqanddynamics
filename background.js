@@ -30,6 +30,16 @@ async function unmarkTabActive(tabId) {
   await chrome.storage.session.set({ [SESSION_KEY]: tabs });
 }
 
+async function clearActiveTabs() {
+  await chrome.storage.session.set({ [SESSION_KEY]: {} });
+}
+
+async function resetMasterForNewSession() {
+  await chrome.storage.local.set({ masterEnabled: false });
+  await clearActiveTabs();
+  updateIcon(false);
+}
+
 async function activateTab(tabId) {
   if (!tabId) return;
   await markTabActive(tabId);
@@ -67,6 +77,21 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   unmarkTabActive(tabId);
 });
 
+chrome.tabs.onRemoved.addListener((tabId) => {
+  unmarkTabActive(tabId);
+});
+
+chrome.windows.onRemoved.addListener(async () => {
+  try {
+    const windows = await chrome.windows.getAll({ windowTypes: ['normal'] });
+    if (windows.length === 0) {
+      await resetMasterForNewSession();
+    }
+  } catch (err) {
+    console.warn('AuraAudio background: Failed to reset on window close', err);
+  }
+});
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.storage.local.get({ masterEnabled: DEFAULT_SETTINGS.masterEnabled }, (items) => {
     updateIcon(items.masterEnabled !== false);
@@ -74,9 +99,7 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 chrome.runtime.onStartup.addListener(() => {
-  chrome.storage.local.get({ masterEnabled: DEFAULT_SETTINGS.masterEnabled }, (items) => {
-    updateIcon(items.masterEnabled !== false);
-  });
+  resetMasterForNewSession();
 });
 
 chrome.storage.local.get({ masterEnabled: DEFAULT_SETTINGS.masterEnabled }, (items) => {
