@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "AuraAudio EQ & Dynamics",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "4-Band Parametric EQ, Compressor, and Limiter for Web Audio.",
   "homepage_url": "https://github.com/Shohei-Tsuchiya/chromeeqanddynamics",
   "permissions": [

@@ -5,7 +5,7 @@
   root.__auraAudioSettingsLoaded = true;
 
   root.DEFAULT_SETTINGS = {
-    masterEnabled: true,
+    masterEnabled: false,
     eqEnabled: true,
     compEnabled: true,
     limiterEnabled: true,
