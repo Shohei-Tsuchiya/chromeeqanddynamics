@@ -1,8 +1,7 @@
 # Chrome Web Store 掲載文案（AuraAudio EQ & Dynamics）
 
-GitHub 公開後、プライバシーポリシー URL に  
-`https://github.com/Shohei-Tsuchiya/chromeeqanddynamics/blob/main/PRIVACY.md`  
-を指定してください。
+**プライバシーポリシー URL:**  
+https://github.com/Shohei-Tsuchiya/chromeeqanddynamics/blob/main/PRIVACY.md
 
 ---
 
@@ -10,66 +9,153 @@ GitHub 公開後、プライバシーポリシー URL に
 
 | 項目 | 内容 |
 |------|------|
-| 拡張機能名（日本語） | AuraAudio EQ & Dynamics |
-| 拡張機能名（英語） | AuraAudio EQ & Dynamics |
+| 拡張機能名 | AuraAudio EQ & Dynamics |
 | カテゴリ | Productivity または Entertainment |
 | 言語 | 日本語（primary）、English |
 
 ---
 
-## 短い説明（132文字以内・英語推奨）
+## 短い説明（日本語・132文字以内）
 
 ```
-4-band parametric EQ, compressor & limiter for web audio. Real-time Web Audio processing with presets.
+YouTubeなどの音をスタジオ品質に。4バンドEQ・コンプ・リミッターをリアルタイム適用。プリセット対応。初回はタブ再読み込みまたはブラウザ再起動を。
 ```
 
-## 詳細説明（英語）
+## 短い説明（英語・132文字以内）
 
 ```
-AuraAudio EQ & Dynamics brings studio-style dynamics processing to any tab playing audio or video.
-
-FEATURES
-• 4-Band Parametric EQ — adjust frequency, Q, and gain per band with a live curve visualizer
-• Compressor — threshold, ratio, attack, release, input/output gain
-• Limiter — protect peaks with threshold and output gain
-• 3 preset slots — save and recall your favorite chains
-• Master bypass — toggle all processing from the toolbar; icon reflects on/off state
-
-HOW IT WORKS
-The extension intercepts media elements on web pages and routes audio through a Web Audio graph. Settings are stored locally on your device only — no data is sent to external servers.
-
-NOTE
-If audio is silent after installing, refresh the page once so the browser can start the audio context.
-
-PRIVACY
-No analytics, no tracking, no cloud sync. See the privacy policy linked on this listing.
-```
-
-## 詳細説明（日本語・ストアの日本語欄用）
-
-```
-AuraAudio EQ & Dynamics は、Web ページの音声・動画にスタジオ品質のダイナミクス処理をリアルタイムで適用する Chrome 拡張機能です。
-
-【主な機能】
-• 4バンド・パラメトリック EQ — 周波数・Q・ゲインをバンドごとに調整。EQ カーブを可視化
-• コンプレッサー — スレッショルド、レシオ、アタック、リリース、入出力ゲイン
-• リミッター — ピーク保護
-• プリセット 3 スロット — お気に入りの設定を保存・呼び出し
-• マスター ON/OFF — ツールバーから全体のバイパス切替（アイコンで状態表示）
-
-【動作】
-ページ内のメディア要素の音声を Web Audio API で処理します。設定は端末内にのみ保存され、外部サーバーへ送信されません。
-
-【注意】
-インストール直後に音が出ない場合は、ページを一度再読み込みしてください。
-
-【プライバシー】
-分析・トラッキング・クラウド同期は一切行いません。
+Studio-quality EQ, compressor & limiter for YouTube and more. Real-time Web Audio with presets. After install, reload the tab or restart Chrome.
 ```
 
 ---
 
-## Single purpose（単一目的の説明）
+## 詳細説明（日本語）
+
+```
+AuraAudio EQ & Dynamics は、ブラウザで再生する音声・動画を、スタジオ品質のサウンドに整える Chrome 拡張機能です。
+
+YouTube、音楽配信、ゲーム実況、動画サイトなど、タブ内の音を Web Audio API でリアルタイム処理。面倒な外部ソフトは不要です。ポップアップを開いて ENABLE にするだけで、4バンド EQ・コンプレッサー・リミッターを直感的にコントロールできます。
+
+━━━━━━━━━━━━━━━━
+【初回インストール時のお願い】
+━━━━━━━━━━━━━━━━
+インストール直後は、必ず次のいずれかを行ってください。
+・対象タブ（YouTube など）を再読み込みする
+・または Chrome を再起動する
+
+その後、拡張機能アイコンをクリック → ENABLE → ページ内を一度クリック（または再生し直し）すると効果が始まります。
+
+━━━━━━━━━━━━━━━━
+【主な機能】
+━━━━━━━━━━━━━━━━
+■ 4バンド・パラメトリック EQ
+・周波数 / Q / ゲインをバンドごとに独立調整
+・ゲイン範囲 ±24 dB、Q は 0.1〜2.0（中心 1.0 で操作しやすい設計）
+・ライブ EQ カーブ表示で、音の変化を目で確認
+
+■ コンプレッサー
+・スレッショルド、レシオ、アタック、リリース
+・入力ゲイン / 出力ゲインで音量とダイナミクスを整える
+
+■ リミッター
+・ピークを抑えてクリップを防止
+・出力ゲイン調整に対応
+
+■ プリセット管理
+・お気に入り設定を 3 スロットに保存・呼び出し
+
+■ マスター ON / OFF
+・ツールバーから全体のバイパス切替
+・アイコンの色で状態を表示（有効: 青 / 無効: グレー）
+・Chrome 再起動後は自動で DISABLE（意図しない処理を防止）
+
+━━━━━━━━━━━━━━━━
+【使い方】
+━━━━━━━━━━━━━━━━
+1. 音を処理したいページで拡張機能アイコンをクリック
+2. マスターを ENABLE にする
+3. ページ内を一度クリックするか、再生を再開する
+4. EQ / Comp / Limiter を調整（各ブロックの ACTIVE で個別バイパスも可能）
+
+無効化時はエフェクトのみ OFF（音は継続）。完全に通常再生へ戻す場合は、ページを再読み込みしてください。
+
+━━━━━━━━━━━━━━━━
+【プライバシー】
+━━━━━━━━━━━━━━━━
+・個人データの収集・送信・販売は一切行いません
+・設定は端末内にのみ保存
+・分析・広告・トラッキングなし
+・処理はポップアップを開いたタブのみ（activeTab）
+
+詳細はストア掲載のプライバシーポリシーをご覧ください。
+```
+
+---
+
+## 詳細説明（英語）
+
+```
+AuraAudio EQ & Dynamics brings studio-quality sound shaping to audio and video playing in Chrome.
+
+Process YouTube, music streaming, game streams, and more in real time with the Web Audio API — no external audio software required. Open the popup, turn ENABLE on, and fine-tune a 4-band parametric EQ, compressor, and limiter with a clear visual interface.
+
+━━━━━━━━━━━━━━━━
+FIRST INSTALL — IMPORTANT
+━━━━━━━━━━━━━━━━
+Right after installing, please do one of the following:
+• Reload the tab you want to process (e.g. YouTube), OR
+• Restart Chrome
+
+Then click the extension icon → set ENABLE → click once inside the page (or restart playback) to begin processing.
+
+━━━━━━━━━━━━━━━━
+FEATURES
+━━━━━━━━━━━━━━━━
+• 4-Band Parametric EQ
+  - Independent Frequency / Q / Gain per band
+  - Gain range ±24 dB; Q from 0.1 to 2.0 (centered at 1.0 for easier control)
+  - Live EQ curve visualizer
+
+• Compressor
+  - Threshold, Ratio, Attack, Release
+  - Input and output gain for level and dynamics control
+
+• Limiter
+  - Peak protection to help prevent clipping
+  - Output gain control
+
+• Presets
+  - Save and recall up to 3 favorite setups
+
+• Master ON / OFF
+  - Bypass all processing from the toolbar
+  - Icon color shows status (enabled: blue / disabled: gray)
+  - Automatically returns to DISABLED after a Chrome restart
+
+━━━━━━━━━━━━━━━━
+HOW TO USE
+━━━━━━━━━━━━━━━━
+1. Open the page you want to process and click the extension icon
+2. Turn the master switch to ENABLE
+3. Click once on the page (or resume playback)
+4. Adjust EQ / Comp / Limiter (use ACTIVE on each block for per-effect bypass)
+
+When disabled, effects are off but audio continues. Refresh the page to return fully to native playback.
+
+━━━━━━━━━━━━━━━━
+PRIVACY
+━━━━━━━━━━━━━━━━
+• No personal data is collected, transmitted, or sold
+• Settings stay on your device only
+• No analytics, ads, or tracking
+• Processing runs only on the tab where you open the popup (activeTab)
+
+See the privacy policy linked on this listing for details.
+```
+
+---
+
+## Single purpose（審査用）
 
 ```
 Apply parametric EQ, compression, and limiting to audio and video playback in web browser tabs using the Web Audio API.
@@ -81,51 +167,16 @@ Apply parametric EQ, compression, and limiting to audio and video playback in we
 
 | 権限 | 説明 |
 |------|------|
-| `storage` | EQ / コンプ / リミッター設定と 3 つのプリセットスロットを端末内に保存するため |
-| Host permission（http/https） | ページ上の `<audio>` / `<video>` 要素を Web Audio グラフに接続し、リアルタイムでエフェクトを適用するため |
+| `storage` | 設定とプリセットを端末内に保存するため |
+| `activeTab` | ユーザーがポップアップを開いたタブのみにアクセスするため |
+| `scripting` | 対象タブへ音声処理スクリプトを注入するため |
 
 ---
 
-## スクリーンショット（必須）
+## 画像
 
-最低 **1 枚**（推奨 3〜5 枚、1280×800 または 640×400）。
-
-### 撮影手順
-
-1. YouTube など音楽が流れるページを開く
-2. 拡張ポップアップを開き、EQ カーブが見える状態にする
-3. Windows: `Win + Shift + S` で範囲キャプチャ
-4. 推奨ショット:
-   - メイン UI 全体（EQ カーブ + 3 ブロック）
-   - EQ バンド調整中（カーブが変化している状態）
-   - プリセット管理セクション
-   - マスター OFF 時のグレーアイコン（小プロモ用 440×280 も任意）
-
-保存先: `store-assets/screenshots/`（Git には含めなくて OK）
-
----
-
-## プロモーション用タイル（任意）
-
-- **Small promo tile:** 440 × 280 px
-- **Marquee promo tile:** 1400 × 560 px
-
-`icon.png` をベースに Canva 等で「AuraAudio EQ & Dynamics」のテキストを添えると十分です。
-
----
-
-## アップロード手順
-
-1. [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole) にログイン  
-   （初回は **$5 の開発者登録料** が必要）
-2. **New item** → `dist/aura-audio-eq-dynamics-v1.0.zip` をアップロード
-3. ストア掲載情報・スクリーンショット・プライバシーポリシー URL を入力
-4. **Privacy practices** で「ユーザー個人データを収集しない」を選択
-5. **Submit for review**（通常 1〜3 営業日）
-
----
-
-## 審査で聞かれやすい点
-
-- **広い host permission:** 任意のサイトのメディアにエフェクトをかける拡張のため http/https 全体が必要。Single purpose と権限説明を明記。
-- **音が出ない:** ユーザー向けに README / ストア説明に「ページ再読み込み」を記載済み。
+| 項目 | ファイル |
+|------|---------|
+| スクリーンショット | `store-assets/screenshots/screenshot-1280x800.png` |
+| 小プロモ | `store-assets/screenshots/promo-small-440x280.png` |
+| マーキー | `store-assets/screenshots/promo-marquee-1400x560.png` |
